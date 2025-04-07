@@ -31,6 +31,7 @@ set(CMAKE_CXX_FLAGS_PROFILE "${CMAKE_CXX_FLAGS_RELEASE}")
 
 # Use Unicode for all projects.
 add_definitions(-DUNICODE -D_UNICODE)
+add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 
 # Compilation settings that should be applied to most targets.
 #
@@ -48,6 +49,10 @@ endfunction()
 # Flutter library and tool build rules.
 set(FLUTTER_MANAGED_DIR "${CMAKE_CURRENT_SOURCE_DIR}/flutter")
 add_subdirectory(${FLUTTER_MANAGED_DIR})
+
+set(CMAKE_CXX_STANDARD 14)  # Or set to 17 or 20 if needed
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 
 # Application build; see runner/CMakeLists.txt.
 add_subdirectory("runner")
@@ -69,8 +74,14 @@ if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
   set(CMAKE_INSTALL_PREFIX "${BUILD_BUNDLE_DIR}" CACHE PATH "..." FORCE)
 endif()
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_CRT_SECURE_NO_WARNINGS")
+
 set(INSTALL_BUNDLE_DATA_DIR "${CMAKE_INSTALL_PREFIX}/data")
 set(INSTALL_BUNDLE_LIB_DIR "${CMAKE_INSTALL_PREFIX}")
+
+set(CMAKE_CXX_STANDARD 14)  # or 17, depending on your requirements
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 
 install(TARGETS ${BINARY_NAME} RUNTIME DESTINATION "${CMAKE_INSTALL_PREFIX}"
   COMPONENT Runtime)
@@ -92,6 +103,9 @@ set(NATIVE_ASSETS_DIR "${PROJECT_BUILD_DIR}native_assets/windows/")
 install(DIRECTORY "${NATIVE_ASSETS_DIR}"
    DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
    COMPONENT Runtime)
+
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zc:__cplusplus")
 
 # Fully re-copy the assets directory on each build to avoid having stale files
 # from a previous install.

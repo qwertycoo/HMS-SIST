@@ -3,12 +3,12 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:web_socket_channel/io.dart';
 
-class ChatScreen extends StatefulWidget {
+class ChatAI extends StatefulWidget {
   @override
-  _DiscordChatScreenState createState() => _DiscordChatScreenState();
+  _DiscordChatAIState createState() => _DiscordChatAIState();
 }
 
-class _DiscordChatScreenState extends State<ChatScreen> {
+class _DiscordChatAIState extends State<ChatAI> {
   TextEditingController _controller = TextEditingController();
   List<Map<String, String>> messages = [];
   late IOWebSocketChannel channel;

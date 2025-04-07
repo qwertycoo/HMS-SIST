@@ -1,14 +1,14 @@
 plugins {
     id("com.android.application")
     id("kotlin-android")
-    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
+    id("com.google.gms.google-services") // Apply the Google services plugin here
 }
 
 android {
     namespace = "com.example.university_app"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = "25.2.9519653" // Specify the NDK version manually
+
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -20,12 +20,15 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.university_app"
+        applicationId = "com.example.sisthub"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
+
+    ndkVersion = "27.0.12077973"
+
 
     buildTypes {
         release {
@@ -34,10 +37,10 @@ android {
     }
 }
 
-flutter {
-    source = "../.."
+dependencies {
+    implementation("com.google.firebase:firebase-database:20.0.0")  // Firebase Realtime Database
+    implementation("com.google.firebase:firebase-auth:21.0.1")  // Firebase Authentication (optional)
 }
-
 
 flutter {
     source = "../.."

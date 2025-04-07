@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "932406242298",
+    "firebase_url": "https://sist-d464f-default-rtdb.firebaseio.com",
+    "project_id": "sist-d464f",
+    "storage_bucket": "sist-d464f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:932406242298:android:f2808d34bfc6ba16ba1243",
+        "android_client_info": {
+          "package_name": "com.example.sisthub"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCyL0TLYm48Kp_mm0pGMPXV2LFEUc_v8ng"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -19,6 +19,11 @@ dependencies:
   video_player: ^2.8.2
   url_launcher: ^6.1.14
   web_socket_channel: ^3.0.2
+  firebase_core: ^2.24.0
+  firebase_auth: ^4.15.0
+  firebase_auth_web: ^5.9.5
+  firebase_database: ^10.3.2
+
 
 
 

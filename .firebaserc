@@ -1,5 +1,8 @@
 {
   "projects": {
-    "default": "sisthub-10a29"
-  }
+    "default": "sist-d464f",
+    "Sist1": "sist-d464f"
+  },
+  "targets": {},
+  "etags": {}
 }

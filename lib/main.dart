@@ -1,12 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'ChatMessage.dart';
 import 'chat.dart'; // Import the chat screen
 
 
-void main() {
+void main() async{
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: FirebaseOptions(
+          apiKey: "AIzaSyCSBUlynRalqW8Xdx-40GfBp8UsDStzhxE",
+          authDomain: "sist-d464f.firebaseapp.com",
+          databaseURL: "https://sist-d464f-default-rtdb.firebaseio.com",
+          projectId: "sist-d464f",
+          storageBucket: "sist-d464f.firebasestorage.app",
+          messagingSenderId: "932406242298",
+          appId: "1:932406242298:web:f77e52c3c7e07968ba1243",
+          measurementId: "G-P43614W1CB"
+        ),
+  );
+  await FirebaseAuth.instance.signInAnonymously();
   runApp(const UniversityApp());
 }
+
 
 class UniversityApp extends StatelessWidget {
   const UniversityApp({Key? key}) : super(key: key);
@@ -28,7 +45,8 @@ class UniversityApp extends StatelessWidget {
       ),
       home: const HomePage(),
       routes: {
-          '/chat': (context) => ChatScreen(), // Register ChatScreen route
+          '/chat': (context) => ChatAI(), // Register ChatScreen route
+          '/dm': (context) => const ChatScreen(),
         },
     );
   }
@@ -504,9 +522,9 @@ class _HomePageState extends State<HomePage> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.notifications_outlined),
+            icon: const Icon(Icons.forum_outlined),
             onPressed: () {
-              // Navigate to notifications page
+              Navigator.pushNamed(context, '/dm');
             },
           ),
           IconButton(
