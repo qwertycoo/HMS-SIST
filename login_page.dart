@@ -26,8 +26,8 @@ class _LoginPageState extends State<LoginPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Login Successful!')),
         );
-        // Navigate to the Staff Availability page after successful login
-        Navigator.pushReplacementNamed(context, '/staffAvailability');
+        // Navigate to the Staff Availability Display page after successful login
+        Navigator.pushReplacementNamed(context, '/staffAvailabilityDisplay');
       } on FirebaseAuthException catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error: ${e.message}')),
