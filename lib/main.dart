@@ -1,35 +1,36 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'home_page.dart';
+import 'profile_page.dart';
+import 'login_page.dart';
+import 'signup_page.dart';
+import 'staff_availability_display_page.dart';
+import 'chat.dart'; // Assuming this is your ChatAI class
 import 'ChatMessage.dart';
-import 'chat.dart'; // Import the chat screen
 
-
-void main() async{
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: FirebaseOptions(
-          apiKey: "AIzaSyCSBUlynRalqW8Xdx-40GfBp8UsDStzhxE",
-          authDomain: "sist-d464f.firebaseapp.com",
-          databaseURL: "https://sist-d464f-default-rtdb.firebaseio.com",
-          projectId: "sist-d464f",
-          storageBucket: "sist-d464f.firebasestorage.app",
-          messagingSenderId: "932406242298",
-          appId: "1:932406242298:web:f77e52c3c7e07968ba1243",
-          measurementId: "G-P43614W1CB"
-        ),
+      apiKey: "AIzaSyCSBUlynRalqW8Xdx-40GfBp8UsDStzhxE",
+      authDomain: "sist-d464f.firebaseapp.com",
+      databaseURL: "https://sist-d464f-default-rtdb.firebaseio.com",
+      projectId: "sist-d464f",
+      storageBucket: "sist-d464f.firebasestorage.app",
+      messagingSenderId: "932406242298",
+      appId: "1:932406242298:web:f77e52c3c7e07968ba1243",
+      measurementId: "G-P43614W1CB"
+    ),
   );
-  await FirebaseAuth.instance.signInAnonymously();
   runApp(const UniversityApp());
 }
-
 
 class UniversityApp extends StatelessWidget {
   const UniversityApp({Key? key}) : super(key: key);
 
   @override
-
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'University Community',
@@ -43,877 +44,180 @@ class UniversityApp extends StatelessWidget {
           elevation: 1,
         ),
       ),
-      home: const HomePage(),
+      home: AuthenticationWrapper(),
       routes: {
-          '/chat': (context) => ChatAI(), // Register ChatScreen route
-          '/dm': (context) => const ChatScreen(),
-        },
-    );
-  }
-}
-
-// Models based on the ERD
-class User {
-  final int userId;
-  final String username;
-  final String email;
-  final String role;
-  final String profilePicUrl;
-  final DateTime dateCreated;
-
-  User({
-    required this.userId,
-    required this.username,
-    required this.email,
-    required this.role,
-    required this.profilePicUrl,
-    required this.dateCreated,
-  });
-}
-
-class Post {
-  final int postId;
-  final String content;
-  final User author;
-  final DateTime datePosted;
-  final List<Comment> comments;
-  final int likes;
-  bool isLiked;
-  bool isSaved;
-
-  Post({
-    required this.postId,
-    required this.content,
-    required this.author,
-    required this.datePosted,
-    required this.comments,
-    required this.likes,
-    this.isLiked = false,
-    this.isSaved = false,
-  });
-}
-
-class Comment {
-  final int commentId;
-  final String content;
-  final User author;
-  final DateTime datePosted;
-
-  Comment({
-    required this.commentId,
-    required this.content,
-    required this.author,
-    required this.datePosted,
-  });
-}
-
-class Event {
-  final int eventId;
-  final String title;
-  final DateTime date;
-  final String location;
-  final String description;
-  final List<User> attendees;
-
-  Event({
-    required this.eventId,
-    required this.title,
-    required this.date,
-    required this.location,
-    required this.description,
-    required this.attendees,
-  });
-}
-
-// Home Page
-class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
-
-  @override
-  State<HomePage> createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
-  int _currentIndex = 0;
-  bool _isLoading = true;
-  List<Post> _posts = [];
-
-  // Current user (in a real app, this would come from authentication)
-  late User currentUser;
-
-  @override
-  void initState() {
-    super.initState();
-    // Simulate loading data
-    _loadData();
-  }
-
-  Future<void> _loadData() async {
-    // Simulating API call delay
-    await Future.delayed(const Duration(seconds: 1));
-
-    // Create mock data
-    currentUser = User(
-      userId: 1,
-      username: "john.doe",
-      email: "john.doe@university.edu",
-      role: "Student",
-      profilePicUrl: "https://i.pravatar.cc/150?img=1",
-      dateCreated: DateTime.now().subtract(const Duration(days: 365)),
-    );
-
-
-
-    final List<User> users = [
-      currentUser,
-      User(
-        userId: 2,
-        username: "prof.smith",
-        email: "smith@university.edu",
-        role: "Staff",
-        profilePicUrl: "https://i.pravatar.cc/150?img=2",
-        dateCreated: DateTime.now().subtract(const Duration(days: 500)),
-      ),
-      User(
-        userId: 3,
-        username: "emma.wilson",
-        email: "emma@university.edu",
-        role: "Student",
-        profilePicUrl: "https://i.pravatar.cc/150?img=3",
-        dateCreated: DateTime.now().subtract(const Duration(days: 200)),
-      ),
-      User(
-        userId: 4,
-        username: "admin.tech",
-        email: "admin@university.edu",
-        role: "Admin",
-        profilePicUrl: "https://i.pravatar.cc/150?img=4",
-        dateCreated: DateTime.now().subtract(const Duration(days: 700)),
-      ),
-    ];
-
-
-
-
-    // Generate mock posts
-    final List<Post> posts = [
-      Post(
-        postId: 1,
-        content: "Just finished my research paper on machine learning applications in educational technology! Looking forward to presenting at the upcoming conference.",
-        author: users[1],
-        datePosted: DateTime.now().subtract(const Duration(hours: 3)),
-        comments: [
-          Comment(
-            commentId: 1,
-            content: "Sounds interesting! Can't wait to read it.",
-            author: users[2],
-            datePosted: DateTime.now().subtract(const Duration(hours: 2)),
-          ),
-          Comment(
-            commentId: 2,
-            content: "Would love to discuss this further. Are you free for coffee tomorrow?",
-            author: users[0],
-            datePosted: DateTime.now().subtract(const Duration(hours: 1)),
-          ),
-        ],
-        likes: 15,
-      ),
-      Post(
-        postId: 2,
-        content: "Reminder: Student Council applications are due next Friday! Don't miss this opportunity to make a difference on campus.",
-        author: users[3],
-        datePosted: DateTime.now().subtract(const Duration(days: 1)),
-        comments: [
-          Comment(
-            commentId: 3,
-            content: "Is there a word limit for the essay portion?",
-            author: users[2],
-            datePosted: DateTime.now().subtract(const Duration(hours: 12)),
-          ),
-        ],
-        likes: 8,
-      ),
-      Post(
-        postId: 3,
-        content: "Just passed my final exams with flying colors! Hard work really does pay off. Now it's time to celebrate! 🎉",
-        author: users[2],
-        datePosted: DateTime.now().subtract(const Duration(days: 2)),
-        comments: [],
-        likes: 27,
-      ),
-      Post(
-        postId: 4,
-        content: "The university library will be extended opening hours during finals week. We'll be open until midnight starting next Monday.",
-        author: users[1],
-        datePosted: DateTime.now().subtract(const Duration(days: 3)),
-        comments: [
-          Comment(
-            commentId: 4,
-            content: "Thank you! This will be incredibly helpful.",
-            author: users[2],
-            datePosted: DateTime.now().subtract(const Duration(days: 2)),
-          ),
-        ],
-        likes: 42,
-      ),
-    ];
-
-    setState(() {
-      _posts = posts;
-      _isLoading = false;
-    });
-  }
-
-  void _likePost(int postId) {
-    setState(() {
-      final postIndex = _posts.indexWhere((post) => post.postId == postId);
-      if (postIndex != -1) {
-        final post = _posts[postIndex];
-        if (post.isLiked) {
-          _posts[postIndex] = Post(
-            postId: post.postId,
-            content: post.content,
-            author: post.author,
-            datePosted: post.datePosted,
-            comments: post.comments,
-            likes: post.likes - 1,
-            isLiked: false,
-            isSaved: post.isSaved,
-          );
-        } else {
-          _posts[postIndex] = Post(
-            postId: post.postId,
-            content: post.content,
-            author: post.author,
-            datePosted: post.datePosted,
-            comments: post.comments,
-            likes: post.likes + 1,
-            isLiked: true,
-            isSaved: post.isSaved,
+        '/login': (context) => LoginPage(),
+        '/signup': (context) => SignupPage(),
+        '/chat': (context) => ChatAI(),
+        '/staffAvailabilityDisplay': (context) => StaffAvailabilityDisplayPage(),
+        '/dm': (context) => const ChatScreen(),
+        '/home': (context) => HomePage(),
+      },
+      onGenerateRoute: (settings) {
+        if (settings.name == '/profile') {
+          final args = settings.arguments as Map<String, dynamic>;
+          final userId = args['userId'];
+          return MaterialPageRoute(
+            builder: (context) => ProfilePage(userId: userId),
           );
         }
-      }
-    });
+        return null;
+      },
+    );
   }
+}
 
-  void _savePost(int postId) {
-    setState(() {
-      final postIndex = _posts.indexWhere((post) => post.postId == postId);
-      if (postIndex != -1) {
-        final post = _posts[postIndex];
-        _posts[postIndex] = Post(
-          postId: post.postId,
-          content: post.content,
-          author: post.author,
-          datePosted: post.datePosted,
-          comments: post.comments,
-          likes: post.likes,
-          isLiked: post.isLiked,
-          isSaved: !post.isSaved,
-        );
-      }
-    });
-  }
+// AuthenticationWrapper to handle authentication state
+class AuthenticationWrapper extends StatelessWidget {
+  const AuthenticationWrapper({Key? key}) : super(key: key);
 
-  void _showCommentSheet(BuildContext context, Post post) {
-    final commentController = TextEditingController();
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.active) {
+          final user = snapshot.data;
+          if (user == null) {
+            return LoginPage();
+          }
+          return HomePage();
+        }
 
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      builder: (context) {
-        return Padding(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom,
-            left: 16,
-            right: 16,
-            top: 16,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Comments',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Flexible(
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: post.comments.length,
-                  itemBuilder: (context, index) {
-                    final comment = post.comments[index];
-                    return CommentTile(comment: comment);
-                  },
-                ),
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  CircleAvatar(
-                    radius: 16,
-                    backgroundImage: NetworkImage(currentUser.profilePicUrl),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: TextField(
-                      controller: commentController,
-                      decoration: const InputDecoration(
-                        hintText: 'Write a comment...',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(24)),
-                        ),
-                        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      ),
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.send),
-                    onPressed: () {
-                      // In a real app, this would add the comment to the database
-                      if (commentController.text.isNotEmpty) {
-                        setState(() {
-                          final newComment = Comment(
-                            commentId: post.comments.length + 1,
-                            content: commentController.text,
-                            author: currentUser,
-                            datePosted: DateTime.now(),
-                          );
-
-                          final postIndex = _posts.indexWhere((p) => p.postId == post.postId);
-                          if (postIndex != -1) {
-                            final updatedComments = List<Comment>.from(post.comments)..add(newComment);
-                            _posts[postIndex] = Post(
-                              postId: post.postId,
-                              content: post.content,
-                              author: post.author,
-                              datePosted: post.datePosted,
-                              comments: updatedComments,
-                              likes: post.likes,
-                              isLiked: post.isLiked,
-                              isSaved: post.isSaved,
-                            );
-                          }
-                        });
-                        commentController.clear();
-                        Navigator.pop(context);
-                      }
-                    },
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-            ],
+        // Show loading indicator while checking auth state
+        return const Scaffold(
+          body: Center(
+            child: CircularProgressIndicator(),
           ),
         );
       },
     );
   }
+}
 
-  void _showCreatePostSheet(BuildContext context) {
-    final postController = TextEditingController();
+// Data models
+class Post {
+  final String id;
+  final String content;
+  final String userId;
+  final String authorName;
+  final String authorProfilePic;
+  final DateTime datePosted;
+  final int likes;
 
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      builder: (context) {
-        return Padding(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom,
-            left: 16,
-            right: 16,
-            top: 16,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Create Post',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  CircleAvatar(
-                    radius: 20,
-                    backgroundImage: NetworkImage(currentUser.profilePicUrl),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    currentUser.username,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: postController,
-                decoration: const InputDecoration(
-                  hintText: "What's on your mind?",
-                  border: OutlineInputBorder(),
-                ),
-                maxLines: 5,
-              ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  TextButton.icon(
-                    icon: const Icon(Icons.image),
-                    label: const Text('Add Image'),
-                    onPressed: () {
-                      // Image picker functionality would go here
-                    },
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      // In a real app, this would save the post to the database
-                      if (postController.text.isNotEmpty) {
-                        setState(() {
-                          final newPost = Post(
-                            postId: _posts.length + 1,
-                            content: postController.text,
-                            author: currentUser,
-                            datePosted: DateTime.now(),
-                            comments: [],
-                            likes: 0,
-                          );
-                          _posts = [newPost, ..._posts];
-                        });
-                        postController.clear();
-                        Navigator.pop(context);
-                      }
-                    },
-                    child: const Text('Post'),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-            ],
-          ),
-        );
-      },
-    );
+  Post({
+    required this.id,
+    required this.content,
+    required this.userId,
+    required this.authorName,
+    required this.authorProfilePic,
+    required this.datePosted,
+    required this.likes,
+  });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'content': content,
+      'userId': userId,
+      'authorName': authorName,
+      'authorProfilePic': authorProfilePic,
+      'datePosted': datePosted.toIso8601String(),
+      'likes': likes,
+    };
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'University Community',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.forum_outlined),
-            onPressed: () {
-              Navigator.pushNamed(context, '/dm');
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.message_outlined),
-            onPressed: () {
-              Navigator.pushNamed(context, '/chat');
-            },
-          ),
-        ],
-      ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : RefreshIndicator(
-              onRefresh: _loadData,
-              child: ListView.builder(
-                itemCount: _posts.length + 1, // +1 for the create post card
-                itemBuilder: (context, index) {
-                  if (index == 0) {
-                    return CreatePostCard(
-                      currentUser: currentUser,
-                      onTap: () => _showCreatePostSheet(context),
-                    );
-                  }
-                  final post = _posts[index - 1];
-                  return PostCard(
-                    post: post,
-                    onLike: () => _likePost(post.postId),
-                    onComment: () => _showCommentSheet(context, post),
-                    onSave: () => _savePost(post.postId),
-                    onShare: () {
-                      // Share functionality would go here
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Sharing post...')),
-                      );
-                    },
-                  );
-                },
-              ),
-            ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        type: BottomNavigationBarType.fixed,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
-            activeIcon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.people_outline),
-            activeIcon: Icon(Icons.people),
-            label: 'Network',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_today_outlined),
-            activeIcon: Icon(Icons.calendar_today),
-            label: 'Events',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline),
-            activeIcon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-                  Navigator.pushNamed(context, '/chat'); // Navigate to Chat Screen
-                }, child: const Icon(Icons.create),
-                backgroundColor: Colors.blue,
-      ),
+  factory Post.fromMap(String id, Map<String, dynamic> map) {
+    return Post(
+      id: id,
+      content: map['content'] ?? '',
+      userId: map['userId'] ?? '',
+      authorName: map['authorName'] ?? 'Anonymous',
+      authorProfilePic: map['authorProfilePic'] ?? 'https://i.pravatar.cc/150',
+      datePosted: DateTime.parse(map['datePosted']),
+      likes: map['likes'] ?? 0,
     );
   }
 }
 
-class CreatePostCard extends StatelessWidget {
-  final User currentUser;
-  final VoidCallback onTap;
+// Service for posts
+class PostService {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  const CreatePostCard({
-    Key? key,
-    required this.currentUser,
-    required this.onTap,
-  }) : super(key: key);
+  // Create a new post
+  Future<void> createPost(String content) async {
+    try {
+      final currentUser = _auth.currentUser;
+      if (currentUser == null) {
+        throw Exception('User not authenticated');
+      }
 
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.all(8),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Row(
-          children: [
-            CircleAvatar(
-              radius: 20,
-              backgroundImage: NetworkImage(currentUser.profilePicUrl),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: InkWell(
-                onTap: onTap,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey.shade300),
-                    borderRadius: BorderRadius.circular(24),
-                  ),
-                  child: const Text(
-                    "What's on your mind?",
-                    style: TextStyle(color: Colors.grey),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: 8),
-            IconButton(
-              icon: const Icon(Icons.image_outlined, color: Colors.green),
-              onPressed: onTap,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
+      // Get user data from Firestore
+      final userDoc = await _firestore.collection('users').doc(currentUser.uid).get();
 
-class PostCard extends StatelessWidget {
-  final Post post;
-  final VoidCallback onLike;
-  final VoidCallback onComment;
-  final VoidCallback onSave;
-  final VoidCallback onShare;
+      // Default values if user profile doesn't exist
+      final userData = userDoc.exists
+          ? userDoc.data() as Map<String, dynamic>
+          : {
+              'username': currentUser.email?.split('@')[0] ?? 'Anonymous',
+              'profilePictureUrl': 'https://i.pravatar.cc/150',
+            };
 
-  const PostCard({
-    Key? key,
-    required this.post,
-    required this.onLike,
-    required this.onComment,
-    required this.onSave,
-    required this.onShare,
-  }) : super(key: key);
+      // Create post data
+      final postData = {
+        'content': content,
+        'userId': currentUser.uid,
+        'authorName': userData['username'] ?? 'Anonymous',
+        'authorProfilePic': userData['profilePictureUrl'] ?? 'https://i.pravatar.cc/150',
+        'datePosted': DateTime.now().toIso8601String(),
+        'likes': 0,
+      };
 
-  String _getTimeAgo(DateTime dateTime) {
-    final now = DateTime.now();
-    final difference = now.difference(dateTime);
-
-    if (difference.inDays > 0) {
-      return '${difference.inDays}d ago';
-    } else if (difference.inHours > 0) {
-      return '${difference.inHours}h ago';
-    } else if (difference.inMinutes > 0) {
-      return '${difference.inMinutes}m ago';
-    } else {
-      return 'Just now';
+      // Save the post to Firestore
+      await _firestore.collection('posts').add(postData);
+    } catch (e) {
+      print('Error creating post: $e');
+      rethrow;
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Post header
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Row(
-              children: [
-                CircleAvatar(
-                  radius: 20,
-                  backgroundImage: NetworkImage(post.author.profilePicUrl),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        post.author.username,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        '${post.author.role} • ${_getTimeAgo(post.datePosted)}',
-                        style: TextStyle(
-                          color: Colors.grey[600],
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.more_horiz),
-                  onPressed: () {
-                    // Show post options
-                  },
-                ),
-              ],
-            ),
-          ),
-
-          // Post content
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-            child: Text(post.content),
-          ),
-
-          // Post stats
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.thumb_up,
-                  size: 16,
-                  color: Colors.blue[400],
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  post.likes.toString(),
-                  style: TextStyle(
-                    color: Colors.grey[600],
-                    fontSize: 12,
-                  ),
-                ),
-                const Spacer(),
-                if (post.comments.isNotEmpty)
-                  Text(
-                    '${post.comments.length} ${post.comments.length == 1 ? 'comment' : 'comments'}',
-                    style: TextStyle(
-                      color: Colors.grey[600],
-                      fontSize: 12,
-                    ),
-                  ),
-              ],
-            ),
-          ),
-
-          const Divider(height: 1),
-
-          // Post actions
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                TextButton.icon(
-                  icon: Icon(
-                    post.isLiked ? Icons.thumb_up : Icons.thumb_up_outlined,
-                    color: post.isLiked ? Colors.blue : Colors.grey[600],
-                  ),
-                  label: Text(
-                    'Like',
-                    style: TextStyle(
-                      color: post.isLiked ? Colors.blue : Colors.grey[600],
-                    ),
-                  ),
-                  onPressed: onLike,
-                ),
-                TextButton.icon(
-                  icon: Icon(
-                    Icons.comment_outlined,
-                    color: Colors.grey[600],
-                  ),
-                  label: Text(
-                    'Comment',
-                    style: TextStyle(
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                  onPressed: onComment,
-                ),
-                TextButton.icon(
-                  icon: Icon(
-                    post.isSaved ? Icons.bookmark : Icons.bookmark_outline,
-                    color: post.isSaved ? Colors.purple : Colors.grey[600],
-                  ),
-                  label: Text(
-                    'Save',
-                    style: TextStyle(
-                      color: post.isSaved ? Colors.purple : Colors.grey[600],
-                    ),
-                  ),
-                  onPressed: onSave,
-                ),
-                TextButton.icon(
-                  icon: Icon(
-                    Icons.share_outlined,
-                    color: Colors.grey[600],
-                  ),
-                  label: Text(
-                    'Share',
-                    style: TextStyle(
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                  onPressed: onShare,
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
+  // Get posts for the feed
+  Stream<QuerySnapshot> getAllPosts() {
+    return _firestore
+        .collection('posts')
+        .orderBy('datePosted', descending: true)
+        .snapshots();
   }
 }
 
-class CommentTile extends StatelessWidget {
-  final Comment comment;
+// User service to handle user data
+class UserService {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  const CommentTile({
-    Key? key,
-    required this.comment,
-  }) : super(key: key);
+  // Create user in Firestore after signup
+  Future<void> createUserInFirestore(User user) async {
+    try {
+      final userData = {
+        'email': user.email,
+        'username': user.email?.split('@')[0] ?? 'Anonymous',
+        'fullname': 'New User',
+        'profilePictureUrl': 'https://i.pravatar.cc/150',
+        'dateCreated': DateTime.now().toIso8601String(),
+      };
 
-  String _getTimeAgo(DateTime dateTime) {
-    final now = DateTime.now();
-    final difference = now.difference(dateTime);
-
-    if (difference.inDays > 0) {
-      return '${difference.inDays}d ago';
-    } else if (difference.inHours > 0) {
-      return '${difference.inHours}h ago';
-    } else if (difference.inMinutes > 0) {
-      return '${difference.inMinutes}m ago';
-    } else {
-      return 'Just now';
+      await _firestore.collection('users').doc(user.uid).set(userData);
+    } catch (e) {
+      print('Error creating user in Firestore: $e');
+      rethrow;
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          CircleAvatar(
-            radius: 16,
-            backgroundImage: NetworkImage(comment.author.profilePicUrl),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[200],
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        comment.author.username,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(comment.content),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 8, top: 4),
-                  child: Text(
-                    _getTimeAgo(comment.datePosted),
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
+  // Get current user data
+  Future<DocumentSnapshot?> getCurrentUserData() async {
+    final user = _auth.currentUser;
+    if (user == null) return null;
+
+    return await _firestore.collection('users').doc(user.uid).get();
   }
 }
