@@ -50,7 +50,6 @@ class UniversityApp extends StatelessWidget {
         '/signup': (context) => SignupPage(),
         '/chat': (context) => ChatAI(),
         '/staffAvailabilityDisplay': (context) => StaffAvailabilityDisplayPage(),
-        '/dm': (context) => const ChatScreen(),
         '/home': (context) => HomePage(),
       },
       onGenerateRoute: (settings) {

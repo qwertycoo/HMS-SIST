@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'ChatMessage.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -178,52 +179,70 @@ class _HomePageState extends State<HomePage> {
                   _initializeStream();
                 });
               },
-              child: Column(
-                children: [
-                  // Create post card
-                  Card(
-                    margin: const EdgeInsets.all(8),
-                    child: Padding(
-                      padding: const EdgeInsets.all(12),
-                      child: Row(
-                        children: [
-                          FutureBuilder<DocumentSnapshot>(
-                            future: _firestore.collection('users').doc(_auth.currentUser?.uid ?? '').get(),
-                            builder: (context, snapshot) {
-                              final userData = snapshot.data?.data() as Map<String, dynamic>?;
-                              return CircleAvatar(
-                                radius: 20,
-                                backgroundImage: NetworkImage(
-                                  userData?['profilePictureUrl'] ?? 'https://i.pravatar.cc/150',
-                                ),
-                              );
-                            },
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: InkWell(
-                              onTap: _showCreatePostSheet,
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                                decoration: BoxDecoration(
-                                  border: Border.all(color: Colors.grey.shade300),
-                                  borderRadius: BorderRadius.circular(24),
-                                ),
-                                child: const Text(
-                                  "What's on your mind?",
-                                  style: TextStyle(color: Colors.grey),
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    // Create post card
+                    Card(
+                      margin: const EdgeInsets.all(8),
+                      child: Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: Row(
+                          children: [
+                            FutureBuilder<DocumentSnapshot>(
+                              future: _firestore.collection('users').doc(_auth.currentUser?.uid ?? '').get(),
+                              builder: (context, snapshot) {
+                                final userData = snapshot.data?.data() as Map<String, dynamic>?;
+                                return CircleAvatar(
+                                  radius: 20,
+                                  backgroundImage: NetworkImage(
+                                    userData?['profilePictureUrl'] ?? 'https://i.pravatar.cc/150',
+                                  ),
+                                );
+                              },
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: InkWell(
+                                onTap: _showCreatePostSheet,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                  decoration: BoxDecoration(
+                                    border: Border.all(color: Colors.grey.shade300),
+                                    borderRadius: BorderRadius.circular(24),
+                                  ),
+                                  child: const Text(
+                                    "What's on your mind?",
+                                    style: TextStyle(color: Colors.grey),
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
-                  ),
 
-                  // Posts list
-                  Expanded(
-                    child: StreamBuilder<QuerySnapshot>(
+                    // Elevated Button
+                    Center(
+                      child: ElevatedButton.icon(
+                        icon: const Icon(Icons.chat),
+                        label: const Text('Open Chats'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue,
+                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                        ),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const ChatListScreen()),
+                          );
+                        },
+                      ),
+                    ),
+
+                    // Posts list
+                    StreamBuilder<QuerySnapshot>(
                       stream: _postsStream,
                       builder: (context, snapshot) {
                         if (snapshot.hasError) {
@@ -239,6 +258,7 @@ class _HomePageState extends State<HomePage> {
                         }
 
                         return ListView.builder(
+                          shrinkWrap: true,  // Prevent the ListView from expanding too much
                           itemCount: snapshot.data!.docs.length,
                           itemBuilder: (context, index) {
                             final doc = snapshot.data!.docs[index];
@@ -318,8 +338,8 @@ class _HomePageState extends State<HomePage> {
                         );
                       },
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
       floatingActionButton: FloatingActionButton(
