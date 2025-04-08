@@ -3,7 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'home_page.dart';
-import 'profile_page.dart';
+import 'profile_page_section.dart';
 import 'login_page.dart';
 import 'signup_page.dart';
 import 'staff_availability_display_page.dart';
@@ -57,7 +57,7 @@ class UniversityApp extends StatelessWidget {
           final args = settings.arguments as Map<String, dynamic>;
           final userId = args['userId'];
           return MaterialPageRoute(
-            builder: (context) => ProfilePage(userId: userId),
+            builder: (context) => ProfilePage(uid: userId),
           );
         }
         return null;

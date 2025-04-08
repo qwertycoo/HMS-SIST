@@ -347,6 +347,33 @@ class _HomePageState extends State<HomePage> {
         child: const Icon(Icons.create),
         backgroundColor: Colors.blue,
       ),
+
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: 0, // 0 = home
+        onTap: (index) async {
+          if (index == 1) {
+            final currentUser = FirebaseAuth.instance.currentUser;
+            if (currentUser != null) {
+              Navigator.pushNamed(
+                context,
+                '/profile',
+                arguments: {'userId': currentUser.uid},
+              );
+            }
+          }
+        },
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Profile',
+          ),
+        ],
+      ),
+
     );
   }
 }
